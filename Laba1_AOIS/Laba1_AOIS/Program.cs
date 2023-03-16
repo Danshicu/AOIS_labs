@@ -1,58 +1,64 @@
-﻿Digit first = new Digit(11);
-Digit second = new Digit(23);
-Digit third = new Digit(-11);
-Digit four = new Digit(-23);
-FloatingPoint theFirst = new FloatingPoint((float)11.5);
-FloatingPoint theSecond = new FloatingPoint((float)23.625);
+﻿    Digit first = new Digit(11);
+    Digit second = new Digit(23);
+    Digit third = new Digit(-11);
+    Digit four = new Digit(-23);
+    FloatingPoint theFirst = new FloatingPoint((float)11.5);
+    FloatingPoint theSecond = new FloatingPoint((float)23.625);
 
-Console.Write("Digits: ");
-first.ShowInt();
-Console.Write("    ");
-second.ShowInt();
-Console.Write("    ");
-theFirst.ShowFloat();
-Console.Write("    ");
-theSecond.ShowFloat();
-Console.Write("\nResults:\n");
+    Console.Write("Digits: ");
+    first.ShowInt();
+    Console.Write("    ");
+    second.ShowInt();
+    Console.Write("    ");
+    theFirst.ShowFloat();
+    Console.Write("    ");
+    theSecond.ShowFloat();
+    Console.Write("\nResults:\n");
 
-Digit total = first + second;
-total.ShowOperate(first, second, '+');
+    Digit total = first + second;
+    total.ShowOperate(first, second, '+');
 
-total = first + four;
-total.ShowOperate(first, four, '+');
+    total = first + four;
+    total.ShowOperate(first, four, '+');
 
-total = third + second;
-total.ShowOperate(third, second, '+');
+    total = third + second;
+    total.ShowOperate(third, second, '+');
 
-total = third + four;
-total.ShowOperate(third, four, '+');
+    total = third + four;
+    total.ShowOperate(third, four, '+');
 
-total = first - second;
-total.ShowOperate(first, second, '-');
+    total = first - second;
+    total.ShowOperate(first, second, '-');
 
-total = first - four;
-total.ShowOperate(first, four, '-');
+    total = first - four;
+    total.ShowOperate(first, four, '-');
 
-total = third - second;
-total.ShowOperate(third, second, '-');
+    total = third - second;
+    total.ShowOperate(third, second, '-');
 
-total = third - four;
-total.ShowOperate(third, four, '-');
+    total = third - four;
+    total.ShowOperate(third, four, '-');
 
-total = first * second;
-total.ShowOperate(first, second, '*');
+    total = first * second;
+    total.ShowOperate(first, second, '*');
 
-total = second / first;
-total.ShowOperate(second, first, '/');
+    total = second / first;
+    total.ShowOperate(second, first, '/');
 
-FloatingPoint result = theFirst + theSecond;
-result.ShowFloat();
+    FloatingPoint result = theFirst + theSecond;
+    result.ShowFloat();
 
-    return 0; 
+    public static class Constants
+{
+    public const byte ExponentAdditionalValue = 127;
+    public const byte IntegerLength = 16;
+    public const byte ExponentLength = 8;
+    public const byte MantisLength=23;
+}
 
 public class Digit 
 {
-    private readonly bool[] _bytes = new bool[16];
+    private readonly bool[] _bytes = new bool[Constants.IntegerLength];
 
     private Digit() { }
     public Digit(int value)
@@ -65,7 +71,7 @@ public class Digit
         {
             _bytes[0] = false;
         }
-        for (byte i = 15; i > 0; i--)
+        for (byte i = Constants.IntegerLength-1; i > 0; i--)
         {
             if (value % 2 == 0)
             {
@@ -99,7 +105,7 @@ public class Digit
     public static Digit PositiveOne()
     {
         Digit posOne = Zero();
-        posOne._bytes[15] = true;
+        posOne._bytes[Constants.IntegerLength-1] = true;
         return posOne;
     }
     
@@ -107,7 +113,7 @@ public class Digit
     {
         Digit negOne = Zero();
         negOne._bytes[0] = true;
-        negOne._bytes[15] = true;
+        negOne._bytes[Constants.IntegerLength-1] = true;
         return negOne;
     }
 
@@ -123,11 +129,11 @@ public class Digit
     private int ToInt()
     {
         int thisInt = 0;
-        for (byte i = 1; i <= 15; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             if (_bytes[i])
             {
-                thisInt += (int)Math.Pow(2, 15 - i);
+                thisInt += (int)Math.Pow(2, Constants.IntegerLength-1 - i);
             }
         }
         if (_bytes[0])
@@ -139,7 +145,7 @@ public class Digit
 
     public void ShowInt()
     {
-        Console.Write(this.ToInt());
+        Console.Write(ToInt());
     }
 
     private static bool Sum(bool first, bool second, ref bool previous)
@@ -156,7 +162,7 @@ public class Digit
     private Digit ToInverse()
     {
         Digit inversed = new Digit();
-        for (byte i = 1; i <= 15; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             inversed._bytes[i] = !_bytes[i];
         }
@@ -172,7 +178,7 @@ public class Digit
     }
     private static Digit Summarize(Digit first, Digit second, Digit result)
     {
-        for (byte i = 15; i > 0; i--) 
+        for (byte i = Constants.IntegerLength-1; i > 0; i--) 
         {
                 bool temp = Sum(first._bytes[i], second._bytes[i], ref result._bytes[i-1]);
                 result._bytes[i] = Sum(temp, result._bytes[i], ref result._bytes[i - 1]);
@@ -200,9 +206,9 @@ public class Digit
     
     private Digit MoveLeftFor(byte step)
     {
-        for (byte i = 1; i < 16; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
-            if (i + step < 16)
+            if (i + step < Constants.IntegerLength)
             {
                 _bytes[i] = _bytes[i + step];
             }
@@ -242,16 +248,16 @@ public class Digit
         Digit result = new Digit();
         Digit firstTemp = Zero();
         Digit secondTemp  = Zero();
-        if (second._bytes[15])
+        if (second._bytes[Constants.IntegerLength-1])
         {
             firstTemp = Copy(first);
             firstTemp._bytes[0] = false;
         }
-        for (byte i = 14; i > 0; i--)
+        for (byte i = Constants.IntegerLength-2; i > 0; i--)
         {
             if (second._bytes[i])
             {
-                secondTemp = Copy(first).MoveLeftFor((byte)(15 - i));
+                secondTemp = Copy(first).MoveLeftFor((byte)(Constants.IntegerLength-1 - i));
                 secondTemp._bytes[0] = false;
                 firstTemp += secondTemp;
             }
@@ -292,7 +298,7 @@ public class Digit
 
     public static bool operator <(Digit first, Digit second)
     {
-        for (byte i = 1; i < 16; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             if (first._bytes[i] != second._bytes[i])
             {
@@ -312,7 +318,7 @@ public class Digit
     
     public static bool operator >(Digit first, Digit second)
     {
-        for (byte i = 1; i < 16; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             if (first._bytes[i] != second._bytes[i])
             {
@@ -332,7 +338,7 @@ public class Digit
 
     public static bool operator ==(Digit first, Digit second)
     {
-        for (byte i = 1; i < 16; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             if (first._bytes[i] != second._bytes[i])
             {
@@ -344,7 +350,7 @@ public class Digit
     
     public static bool operator !=(Digit first, Digit second)
     {
-        for (byte i = 1; i < 16; i++)
+        for (byte i = 1; i < Constants.IntegerLength; i++)
         {
             if (first._bytes[i] != second._bytes[i])
             {
@@ -365,23 +371,23 @@ public class Digit
 public class FloatingPoint
 {
     private bool _sign;
-    private readonly bool[] _exponent = new bool[8];
-    private readonly bool[] _mantis = new bool[23];
+    private readonly bool[] _exponent = new bool[Constants.ExponentLength];
+    private readonly bool[] _mantis = new bool[Constants.MantisLength];
 
     private FloatingPoint() { }
 
     private int GetExponent()
     {
         int result = 0;
-        for (byte i = 0; i < 8; i++)
+        for (byte i = 0; i < Constants.ExponentLength; i++)
         {
             if (_exponent[i])
             {
-                result += (byte)Math.Pow(2, 7 - i);
+                result += (byte)Math.Pow(2, Constants.ExponentLength-1 - i);
             }
         }
 
-        result -= 127;
+        result -= Constants.ExponentAdditionalValue;
         return result;
     }
     
@@ -393,7 +399,7 @@ public class FloatingPoint
         }
         int whole = Math.Abs((int)number);
         float fractional = (Math.Abs(number) - whole);
-        byte intIndex = 22;
+        byte intIndex = Constants.MantisLength-1;
         while (whole >= 1)
         {
             if (whole % 2 == 0)
@@ -411,7 +417,7 @@ public class FloatingPoint
             }
         }
         int currentIndex = 0;
-        while (currentIndex + intIndex <= 22)
+        while (currentIndex + intIndex <= Constants.MantisLength-1)
         {
             _mantis[currentIndex] = _mantis[currentIndex + intIndex];
             currentIndex++;
@@ -427,7 +433,7 @@ public class FloatingPoint
             SetExponent(currentIndex);
 
             currentIndex--;
-            while (currentIndex <= 22)
+            while (currentIndex <= Constants.MantisLength-1)
             {
                 fractional *= 2f;
                 if (fractional  < 1)
@@ -454,7 +460,7 @@ public class FloatingPoint
             
             fractional -= 1;
             byte index = 0;
-            while (index <= 22)
+            while (index <=Constants.MantisLength-1)
             {
                 fractional *= 2;
                 if (fractional  < 1)
@@ -473,8 +479,8 @@ public class FloatingPoint
 
     private void SetExponent(int exponent)
     {
-        exponent += 127;
-        for (int i = 7; i >= 0; i--)
+        exponent += Constants.ExponentAdditionalValue;
+        for (int i = Constants.ExponentLength-1; i >= 0; i--)
         {
             if (exponent % 2 == 0)
             {
@@ -494,7 +500,7 @@ public class FloatingPoint
         int offset = GetExponent();
         if (offset > 0)
         {
-            if (offset >= 23)
+            if (offset >= Constants.MantisLength)
             {
                 Console.WriteLine("NaN");
                 return 0;
@@ -510,7 +516,7 @@ public class FloatingPoint
             }
 
             byte step = 0;
-            for (int i = offset - 1; i < 23; i++)
+            for (int i = offset - 1; i < Constants.MantisLength; i++)
             {
                 if (_mantis[i])
                 {
@@ -522,7 +528,7 @@ public class FloatingPoint
         }
         else
         {
-            for (int i = 0; i < 23; i++)
+            for (int i = 0; i < Constants.MantisLength; i++)
             {
                 if (_mantis[i])
                 {
@@ -566,12 +572,12 @@ public class FloatingPoint
         {
             _sign = old._sign
         };
-        for (byte i = 0; i < 8; i++)
+        for (byte i = 0; i < Constants.ExponentLength; i++)
         {
             copy._exponent[i] = old._exponent[i];
         }
 
-        for (byte index = 0; index < 23; index++)
+        for (byte index = 0; index < Constants.MantisLength; index++)
         {
             copy._mantis[index] = old._mantis[index];
         }
@@ -581,7 +587,7 @@ public class FloatingPoint
 
     private void MoveRightFor(int step, bool moveOnce=false)
     { 
-        for (byte index = 22; index >= step; index--)
+        for (byte index = Constants.MantisLength-1; index >= step; index--)
         {
             _mantis[index] = _mantis[index - step];
         }
@@ -620,7 +626,7 @@ public class FloatingPoint
         bool hasToMoveOnce = offset==1;
         if (offset != 0) {smaller.MoveRightFor(offset, hasToMoveOnce);} 
         bool temp;
-        for (byte i = 22; i > 0; i--) 
+        for (byte i = Constants.MantisLength-1; i > 0; i--) 
         {
             temp = Sum(bigger._mantis[i], smaller._mantis[i], ref result._mantis[i-1]);
             result._mantis[i] = Sum(temp, result._mantis[i], ref result._mantis[i - 1]);
@@ -657,7 +663,7 @@ public class FloatingPoint
 
         if (first.GetExponent() == second.GetExponent())
         {
-            for (byte i = 0; i < 23; i++)
+            for (byte i = 0; i < Constants.MantisLength; i++)
             {
                 if (first._mantis[i] != second._mantis[i])
                 {
@@ -689,7 +695,7 @@ public class FloatingPoint
 
         if (first.GetExponent() == second.GetExponent())
         {
-            for (byte i = 0; i < 23; i++)
+            for (byte i = 0; i < Constants.MantisLength; i++)
             {
                 if (first._mantis[i] != second._mantis[i])
                 {
