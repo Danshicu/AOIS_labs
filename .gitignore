@@ -28,6 +28,14 @@
 *.so.*
 *.dylib
 
+*.csproj
+*.json
+*.sln
+.idea
+.vs
+obj
+bin
+
 # Executables
 *.exe
 *.out
