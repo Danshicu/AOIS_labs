@@ -20,7 +20,8 @@
                 }
             };
             SetVariables();
-            MinimizeWithCalculation();
+            string calculation = MinimizeWithCalculation();
+            Console.WriteLine(calculation);
             //ShowStrings();
         }
 
@@ -37,11 +38,11 @@
             } 
         }
 
-        private void MinimizeWithCalculation()
+        private string MinimizeWithCalculation()
         {
+            string result = null;
             if (IsCorrect())
             {
-                string result = null;
                 for (int firstIndex = 0; firstIndex < _expressions.Length - 1; firstIndex++)
                 {
                     for (int secondIndex = firstIndex + 1; secondIndex < _expressions.Length; secondIndex++)
@@ -58,8 +59,20 @@
                 }
 
                 if (result.Length > 0) result = result.Remove(result.Length - 1);
-                Console.WriteLine(result);
+                for (int i = 0; i < _expressions.Length; i++)
+                {
+                    if (!_gluedNumbers.Contains(i))
+                    {
+                        result += _expressions[i];
+                    }
+                }
             }
+
+            LogicalCalculator calculator = new LogicalCalculator(result, 0);
+            string res = calculator.Calculate();
+            //Console.WriteLine(res);
+            return res;
+            
         }
 
         private bool IsCorrect()
@@ -94,6 +107,7 @@
         {
             if (IsCorrect())
             {
+                int DifferentValues = 0;
                 string result = "(";
                 List<string> commonVars = new List<string>();
                 List<string> firstVarsSet = AllVars[first];
@@ -105,11 +119,25 @@
                     {
                         commonVars.Add(firstVarsSet[i]);
                     }
+                    else
+                    {
+                        if (firstVarsSet[i] == Inversed(secondVarsSet[i]) ||
+                            Inversed(firstVarsSet[i]) == secondVarsSet[i])
+                        {
+                            DifferentValues++;
+                        }
+                    }
+                    
                 }
 
                 if (commonVars.Count < countOfVars - 1)
                 {
                     return string.Empty;
+                }
+
+                if (DifferentValues > 1)
+                {
+                    return String.Empty;
                 }
 
                 foreach (var variable in commonVars)
@@ -122,6 +150,19 @@
                 return result;
             }
             else return string.Empty;
+        }
+        
+        private string Inversed(string value)
+        {
+            if (value[0] != '!')
+            {
+                return $"!{value}";
+            }
+            else
+            {
+                value = value.Remove(0, 1);
+                return value;
+            }
         }
     }
 }

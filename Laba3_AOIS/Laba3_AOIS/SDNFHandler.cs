@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Laba2_AOIS
+﻿namespace Laba2_AOIS
 {
     public class SdnfHandler
     {
@@ -22,7 +20,8 @@ namespace Laba2_AOIS
                 }
             };
             SetVariables();
-            MinimizeWithCalculation();
+            string calculation = MinimizeWithCalculation();
+            Console.WriteLine(calculation);
             //ShowStrings();
         }
 
@@ -39,11 +38,11 @@ namespace Laba2_AOIS
             } 
         }
 
-        private void MinimizeWithCalculation()
+        private string MinimizeWithCalculation()
         {
+            string result = null;
             if (IsCorrect())
             {
-                string result = null;
                 for (int firstIndex = 0; firstIndex < _expressions.Length - 1; firstIndex++)
                 {
                     for (int secondIndex = firstIndex + 1; secondIndex < _expressions.Length; secondIndex++)
@@ -60,8 +59,19 @@ namespace Laba2_AOIS
                 }
 
                 if (result.Length > 0) result = result.Remove(result.Length - 1);
-                Console.WriteLine(result);
+                for (int i = 0; i < _expressions.Length; i++)
+                {
+                    if (!_gluedNumbers.Contains(i))
+                    {
+                        result += _expressions[i];
+                    }
+                }
             }
+            LogicalCalculator calculator = new LogicalCalculator(result, 1);
+            string res = calculator.Calculate();
+            //Console.WriteLine(res);
+            return res;
+            
         }
 
         private bool IsCorrect()
@@ -108,12 +118,25 @@ namespace Laba2_AOIS
                     {
                         commonVars.Add(firstVarsSet[i]);
                     }
+                    else
+                    {
+                        if (firstVarsSet[i] == Inversed(secondVarsSet[i]) ||
+                            Inversed(firstVarsSet[i]) == secondVarsSet[i])
+                        {
+                            DifferentValues++;
+                        }
+                    }
                     
                 }
 
                 if (commonVars.Count < countOfVars - 1)
                 {
                     return string.Empty;
+                }
+
+                if (DifferentValues > 1)
+                {
+                    return String.Empty;
                 }
 
                 foreach (var variable in commonVars)
@@ -130,7 +153,15 @@ namespace Laba2_AOIS
 
         private string Inversed(string value)
         {
-            return $"!{value}";
+            if (value[0] != '!')
+            {
+                return $"!{value}";
+            }
+            else
+            {
+                value = value.Remove(0, 1);
+                return value;
+            }
         }
 
     }
