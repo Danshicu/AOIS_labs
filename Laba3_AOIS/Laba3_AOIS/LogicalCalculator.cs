@@ -5,7 +5,6 @@
         private int status;
         private string _expression;
         private List<string> _expressions;
-        //private List<string> vars = new List<string>();
         private readonly List<List<string>> AllVars = new List<List<string>>();
         private Dictionary<string, string> currentValues = new Dictionary<string, string>();
 

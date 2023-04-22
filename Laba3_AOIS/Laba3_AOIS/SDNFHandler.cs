@@ -2,12 +2,17 @@
 {
     public class SdnfHandler
     {
-        private readonly string _sdnf;
-        private readonly string[]? _expressions = null;
+        private string _sdnf;
+        private string[]? _expressions = null;
         private static readonly List<List<string>> AllVars = new List<List<string>>();
         private static List<int> _gluedNumbers = new List<int>();
 
-        public SdnfHandler(string str)
+        public SdnfHandler()
+        {
+            
+        }
+
+        public void SetExpression (string str)
         {
             _sdnf = str;
             if (IsCorrect())
@@ -21,8 +26,7 @@
             };
             SetVariables();
             string calculation = MinimizeWithCalculation();
-            Console.WriteLine(calculation);
-            //ShowStrings();
+            Console.WriteLine($"Minimized SDNF with calculation method: {calculation}");
         }
 
         private void SetVariables()
@@ -67,9 +71,9 @@
                     }
                 }
             }
+            
             LogicalCalculator calculator = new LogicalCalculator(result, 1);
             string res = calculator.Calculate();
-            //Console.WriteLine(res);
             return res;
             
         }
@@ -163,6 +167,5 @@
                 return value;
             }
         }
-
     }
 }

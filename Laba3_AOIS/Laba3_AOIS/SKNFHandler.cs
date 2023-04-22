@@ -2,12 +2,22 @@
 {
     public class SknfHandler
     {
-        private readonly string _sknf;
-        private readonly string[]? _expressions = null;
+        private string _sknf;
+        private string[]? _expressions = null;
         private static readonly List<List<string>> AllVars = new List<List<string>>();
         private static List<int> _gluedNumbers = new List<int>();
 
-        public SknfHandler(string str)
+        public SknfHandler()
+        {
+            
+        }
+
+        public void AddNumberSet()
+        {
+            
+        }
+
+        public void SetExpression(string str)
         {
             _sknf = str;
             if (IsCorrect())
@@ -21,8 +31,7 @@
             };
             SetVariables();
             string calculation = MinimizeWithCalculation();
-            Console.WriteLine(calculation);
-            //ShowStrings();
+            Console.WriteLine($"Minimized SKNF with calculation method: {calculation}");
         }
 
         private void SetVariables()
@@ -70,7 +79,6 @@
 
             LogicalCalculator calculator = new LogicalCalculator(result, 0);
             string res = calculator.Calculate();
-            //Console.WriteLine(res);
             return res;
             
         }

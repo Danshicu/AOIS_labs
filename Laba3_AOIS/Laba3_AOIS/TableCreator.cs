@@ -59,8 +59,10 @@
             }
             Console.WriteLine($"SDNF: {SDNF}  or vector  {SDNFVector}");
             Console.WriteLine($"SKNF: {SKNF}  or vector  {SKNFVector}");
-            SdnfHandler sdnfHandler = new SdnfHandler(SDNF);
-            SknfHandler sknfHandler = new SknfHandler(SKNF);
+            SdnfHandler sdnfHandler = new SdnfHandler();
+            sdnfHandler.SetExpression(SDNF);
+            SknfHandler sknfHandler = new SknfHandler();
+            sknfHandler.SetExpression(SKNF);
         }
         
         
