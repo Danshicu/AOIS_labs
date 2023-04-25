@@ -1,4 +1,6 @@
-﻿namespace Laba2_AOIS
+﻿using System.Data;
+
+namespace Laba2_AOIS
 {
     public class SdnfHandler
     {
@@ -6,10 +8,157 @@
         private string[]? _expressions = null;
         private static readonly List<List<string>> AllVars = new List<List<string>>();
         private static List<int> _gluedNumbers = new List<int>();
+        private List<List<string>> _terms = new List<List<string>>();
+        private List<string> _preparedTerms = new List<string>();
+        private List<string> _unUsedTerms = new List<string>();
+        private List<string> varsList = new List<string>();
 
         public SdnfHandler()
         {
             
+        }
+        
+        private void InitializeSet(int countOfVars)
+        {
+            if (_terms.Count != countOfVars+1)
+            {
+                _terms.Clear();
+                for (int i = 0; i <= countOfVars; i++)
+                {
+                    _terms.Add(new List<string>());
+                }
+            }
+        }
+        
+        private void SetVariablesFromList()
+        {
+            varsList = AllVars[0];
+            for (int i = 0; i < varsList.Count; i++)
+            {
+                var currentChar = varsList[i];
+                if (currentChar[0] == '!') varsList[i] = Inversed(currentChar);
+            }
+        }
+        
+        private int GetOnesCount(string expr)
+        {
+            int count = 0;
+            foreach (var VARIABLE in expr)
+            { 
+                if (VARIABLE == '1') count++;
+            }
+            return count;
+        }
+        
+        public void AddNumberSet(string set)
+        {
+            string newset = null;
+            for (int i = set.Length-1; i >= 0; i--)
+            {
+                newset += set[i];
+            }
+            InitializeSet(set.Length);
+            int countOfOnes = GetOnesCount(newset);
+            _terms[countOfOnes].Add(newset);
+            _unUsedTerms.Add(newset);
+        }
+        
+        public string MinimizeWithMcCluskeyMethod()
+        {
+            int startTermCount = _terms.Count;
+            for (int i = 0; i < startTermCount; i++)
+            {
+                _preparedTerms.Clear();
+                MakeTermsTable();
+            }
+            SetVariablesFromList();
+            return GetStringFromTerms();
+        }
+        
+        private string GetStringFromTerms()
+        {
+            string result = null;
+            foreach (var term in _unUsedTerms)
+            {
+                result += '(';
+                for (int i = 0; i < term.Length; i++)
+                {
+                    var thisVar = term[i];
+                    if (thisVar == '1') result += varsList[i] + '&';
+                    if (thisVar == '0') result += Inversed(varsList[i]) + '&';
+                }
+
+                result = result.Remove(result.Length - 1, 1);
+                result += ")V";
+            }
+
+            result = result.Remove(result.Length - 1, 1);
+            return result;
+        }
+        
+        private void MakeTermsTable()
+        {
+            if (_terms.Count > 1)
+            {
+                for (int index = 0; index < _terms.Count - 1; index++)
+                {
+                    foreach (var firstVarsSet in _terms[index])
+                    {
+                        foreach (var secondVarsSet in _terms[index + 1])
+                        {
+                            string subRez = TryGetTerm(firstVarsSet, secondVarsSet);
+                            if (subRez != String.Empty)
+                            {
+                                if (_unUsedTerms.Contains(firstVarsSet)) _unUsedTerms.Remove(firstVarsSet);
+                                if (_unUsedTerms.Contains(secondVarsSet)) _unUsedTerms.Remove(secondVarsSet);
+                                if (!_preparedTerms.Contains(subRez)) _preparedTerms.Add(subRez);
+                                if (!_unUsedTerms.Contains(subRez)) _unUsedTerms.Add(subRez);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (_preparedTerms.Count > 1)
+            {
+                InitializeSet(GetOnesCount(_preparedTerms[_preparedTerms.Count - 1]));
+                foreach (var term in _preparedTerms)
+                {
+                    int countOfOnes = GetOnesCount(term);
+                    _terms[countOfOnes].Add(term);
+                }
+            }
+        }
+        
+        private string TryGetTerm(string first, string second)
+        {
+            int difArgsCount = 0;
+            if (first.Length != second.Length)
+            {
+                throw new DataException("Terms must be of the same length");
+            }
+
+            string comparision = null;
+
+            for (int index = 0; index < first.Length; index++)
+            {
+                if(first[index]==second[index])
+                {
+                    comparision += first[index];
+                }
+                else
+                {
+                    difArgsCount++;
+                    comparision += "*";
+                }
+            }
+
+            if (difArgsCount == 1)
+            {
+                return comparision;
+            }
+
+            return string.Empty;
         }
 
         public void SetExpression (string str)
@@ -25,8 +174,6 @@
                 }
             };
             SetVariables();
-            string calculation = MinimizeWithCalculation();
-            Console.WriteLine($"Minimized SDNF with calculation method: {calculation}");
         }
 
         private void SetVariables()
@@ -42,7 +189,7 @@
             } 
         }
 
-        private string MinimizeWithCalculation()
+        public string MinimizeWithCalculation()
         {
             string result = null;
             if (IsCorrect())

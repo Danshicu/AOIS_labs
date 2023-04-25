@@ -70,6 +70,17 @@
                 }
         }
 
+        public string GetVariablesString()
+        {
+            string values = null;
+            foreach (var value in variablesValues)
+            {
+                values+=(GetValueFromBool(value.Value));
+            }
+
+            return values;
+        }
+
         private string? ReplaceExpression(string? incomingExpression)
         {
             string? newExpresion = incomingExpression;

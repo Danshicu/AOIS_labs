@@ -8,11 +8,14 @@
         private string SKNFVector = "()";
         private readonly List<int> results = new List<int>();
         readonly ExpressionHandler expressionHandler;
+        SknfHandler sknfHandler = new SknfHandler();
+        SdnfHandler sdnfHandler = new SdnfHandler();
         
         
         public TableCreator(string? expression)
         {
             expressionHandler = new ExpressionHandler(expression);
+            
         }
 
         public void MakeTable()
@@ -27,11 +30,13 @@
                         SDNF += expressionHandler.ReturnSDNF();
                         SDNF += "V";
                         SDNFVector = SDNFVector.Insert(SDNFVector.Length-1, $"{i},");
+                        sdnfHandler.AddNumberSet(expressionHandler.GetVariablesString());
                         break;
                     case 0:
                         SKNF += expressionHandler.ReturnSKNF();
                         SKNF += "&";
                         SKNFVector = SKNFVector.Insert(SKNFVector.Length-1, $"{i},");
+                        sknfHandler.AddNumberSet(expressionHandler.GetVariablesString());
                         break;
                 }
 
@@ -59,10 +64,16 @@
             }
             Console.WriteLine($"SDNF: {SDNF}  or vector  {SDNFVector}");
             Console.WriteLine($"SKNF: {SKNF}  or vector  {SKNFVector}");
-            SdnfHandler sdnfHandler = new SdnfHandler();
             sdnfHandler.SetExpression(SDNF);
-            SknfHandler sknfHandler = new SknfHandler();
+            string calculationSDNF = sdnfHandler.MinimizeWithCalculation();
+            Console.WriteLine($"Minimized SDNF with calculation method: {calculationSDNF}");
+            string McCluskeySDNF = sdnfHandler.MinimizeWithMcCluskeyMethod();
+            Console.WriteLine($"Minimized SDNF with McCluskey method: {McCluskeySDNF}");
             sknfHandler.SetExpression(SKNF);
+            string calculationSKNF = sknfHandler.MinimizeWithCalculation();
+            Console.WriteLine($"Minimized SKNF with calculation method: {calculationSKNF}");
+            string McCluskeySKNF = sknfHandler.MinimizeWithMcCluskeyMethod();
+            Console.WriteLine($"Minimized SKNF with McCluskey method: {McCluskeySKNF}");
         }
         
         
