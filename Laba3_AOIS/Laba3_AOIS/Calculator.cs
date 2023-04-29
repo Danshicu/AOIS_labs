@@ -1,19 +1,19 @@
-﻿namespace Laba2_AOIS
+﻿namespace Laba3_AOIS
 {
     public static class Calculator
     {
-        private static string? calculatingExpression;
-        private static readonly Stack<char> varsStack = new Stack<char>();
-        private static readonly Stack<char> operationsStack = new Stack<char>();
+        private static string? _calculatingExpression;
+        private static readonly Stack<char> VarsStack = new Stack<char>();
+        private static readonly Stack<char> OperationsStack = new Stack<char>();
         
         
         public static int Calculate(string? expression)
         {
-            calculatingExpression = expression;
+            _calculatingExpression = expression;
             ParseString();
-            var result = varsStack.Pop();
-            varsStack.Clear();
-            operationsStack.Clear();
+            var result = VarsStack.Pop();
+            VarsStack.Clear();
+            OperationsStack.Clear();
             if (result == '1')
             {
                 return 1;
@@ -27,19 +27,19 @@
         private static void ParseString()
         {
             bool bracketOnTop = false;
-            if (calculatingExpression != null)
-                foreach (var currentChar in calculatingExpression)
+            if (_calculatingExpression != null)
+                foreach (var currentChar in _calculatingExpression)
                 {
                     if (currentChar == '(')
                     {
-                        operationsStack.Push(currentChar);
+                        OperationsStack.Push(currentChar);
                         bracketOnTop = true;
                         continue;
                     }
 
                     if (char.IsDigit(currentChar))
                     {
-                        varsStack.Push(currentChar);
+                        VarsStack.Push(currentChar);
                         continue;
                     }
 
@@ -47,20 +47,20 @@
                     {
                         if (bracketOnTop)
                         {
-                            operationsStack.Push(currentChar);
+                            OperationsStack.Push(currentChar);
                             bracketOnTop = false;
                         }
                         else
                         {
-                            if (operationsStack.Count > 0)
+                            if (OperationsStack.Count > 0)
                             {
-                                if (BiggerPriority(operationsStack.Peek(), currentChar))
+                                if (BiggerPriority(OperationsStack.Peek(), currentChar))
                                 {
-                                    CompleteOperation(operationsStack.Pop());
+                                    CompleteOperation(OperationsStack.Pop());
                                 }
                             }
 
-                            operationsStack.Push(currentChar);
+                            OperationsStack.Push(currentChar);
                         }
 
                         continue;
@@ -68,18 +68,19 @@
 
                     if (currentChar == ')')
                     {
-                        while (operationsStack.Peek() != '(')
+                        while (OperationsStack.Peek() != '(')
                         {
-                            CompleteOperation(operationsStack.Pop());
+                            CompleteOperation(OperationsStack.Pop());
                         }
 
-                        operationsStack.Pop();
-                        if (operationsStack.Peek() == '!')
+                        OperationsStack.Pop();
+                        if (OperationsStack.Count > 1)
                         {
-                            CompleteOperation(operationsStack.Pop());
+                            if (OperationsStack.Peek() == '!')
+                            {
+                                CompleteOperation(OperationsStack.Pop());
+                            }
                         }
-
-                        continue;
                     }
                 }
         }
@@ -95,19 +96,19 @@
             {
                 case '*':
                 {
-                    varsStack.Push(Operations.Conjunction(varsStack.Pop(), varsStack.Pop()));
+                    VarsStack.Push(Operations.Conjunction(VarsStack.Pop(), VarsStack.Pop()));
                     break;
                 }
                 
                 case '+':
                 {
-                    varsStack.Push(Operations.Disjunction(varsStack.Pop(), varsStack.Pop()));
+                    VarsStack.Push(Operations.Disjunction(VarsStack.Pop(), VarsStack.Pop()));
                     break;
                 }
                 
                 case '!':
                 {
-                    varsStack.Push(Operations.Inverse(varsStack.Pop()));
+                    VarsStack.Push(Operations.Inverse(VarsStack.Pop()));
                     break;
                 }
             }

@@ -1,23 +1,17 @@
-﻿using System.Collections;
-using System.Data;
+﻿using System.Data;
 
-namespace Laba2_AOIS
+namespace Laba3_AOIS
 {
     public class SknfHandler
     {
-        private string _sknf;
-        private string[]? _expressions = null;
+        private string? _sknf;
+        private string[]? _expressions;
         private static readonly List<List<string>> AllVars = new List<List<string>>();
         private static List<int> _gluedNumbers = new List<int>();
-        private List<List<string>> _terms = new List<List<string>>();
-        private List<string> _preparedTerms = new List<string>();
-        private List<string> _unUsedTerms = new List<string>();
-        private List<string> varsList = new List<string>();
-
-        public SknfHandler()
-        {
-            
-        }
+        private List<List<string?>> _terms = new List<List<string?>>();
+        private List<string?> _preparedTerms = new List<string?>();
+        private List<string?> _unUsedTerms = new List<string?>();
+        private List<string> _varsList = new List<string>();
 
         private void InitializeSet(int countOfVars)
         {
@@ -26,46 +20,54 @@ namespace Laba2_AOIS
                 _terms.Clear();
                 for (int i = 0; i <= countOfVars; i++)
                 {
-                    _terms.Add(new List<string>());
+                    _terms.Add(new List<string?>());
                 }
             }
         }
 
         private void SetVariablesFromList()
         {
-            varsList = AllVars[0];
-            for (int i = 0; i < varsList.Count; i++)
+            _varsList = AllVars[0];
+            for (int i = 0; i < _varsList.Count; i++)
             {
-                var currentChar = varsList[i];
-                if (currentChar[0] == '!') varsList[i] = Inversed(currentChar);
+                var currentChar = _varsList[i];
+                if (currentChar[0] == '!') _varsList[i] = Inversed(currentChar);
             }
         }
 
-        private int GetOnesCount(string expr)
+        private int GetOnesCount(string? expr)
         {
             int count = 0;
-            foreach (var VARIABLE in expr)
-            { 
-                if (VARIABLE == '1') count++;
-            }
+            if (expr != null)
+                foreach (var variable in expr)
+                {
+                    if (variable == '1') count++;
+                }
+
             return count;
         }
         
-        public void AddNumberSet(string set)
+        public void AddNumberSet(string? set)
         {
-            string newset = null;
-            for (int i = set.Length-1; i >= 0; i--)
+            string? newset = null;
+            if (set != null)
             {
-                newset += set[i];
+                for (int i = set.Length - 1; i >= 0; i--)
+                {
+                    newset += set[i];
+                }
+
+                InitializeSet(set.Length);
             }
-            InitializeSet(set.Length);
+
             int countOfOnes = GetOnesCount(newset);
             _terms[countOfOnes].Add(newset);
             _unUsedTerms.Add(newset);
         }
 
-        public string MinimizeWithMcCluskeyMethod()
+        public string? MinimizeWithMcCluskeyMethod()
         {
+            if (_expressions.Length == 1) return _sknf;
             int startTermCount = _terms.Count;
             for (int i = 0; i < startTermCount; i++)
             {
@@ -76,24 +78,25 @@ namespace Laba2_AOIS
             return GetStringFromTerms();
         }
 
-        private string GetStringFromTerms()
+        private string? GetStringFromTerms()
         {
-            string result = null;
+            string? result = null;
             foreach (var term in _unUsedTerms)
             {
                 result += '(';
-                for (int i = 0; i < term.Length; i++)
-                {
-                    var thisVar = term[i];
-                    if (thisVar == '0') result += varsList[i] + 'V';
-                    if (thisVar == '1') result += Inversed(varsList[i]) + 'V';
-                }
+                if (term != null)
+                    for (int i = 0; i < term.Length; i++)
+                    {
+                        var thisVar = term[i];
+                        if (thisVar == '0') result += _varsList[i] + 'V';
+                        if (thisVar == '1') result += Inversed(_varsList[i]) + 'V';
+                    }
 
                 result = result.Remove(result.Length - 1, 1);
                 result += ")&";
             }
 
-            result = result.Remove(result.Length - 1, 1);
+            result = result?.Remove(result.Length - 1, 1);
             return result;
         }
 
@@ -107,7 +110,7 @@ namespace Laba2_AOIS
                     {
                         foreach (var secondVarsSet in _terms[index + 1])
                         {
-                            string subRez = TryGetTerm(firstVarsSet, secondVarsSet);
+                            string? subRez = TryGetTerm(firstVarsSet, secondVarsSet);
                             if (subRez != String.Empty)
                             {
                                 if (_unUsedTerms.Contains(firstVarsSet)) _unUsedTerms.Remove(firstVarsSet);
@@ -131,49 +134,52 @@ namespace Laba2_AOIS
             }
         }
 
-        private string TryGetTerm(string first, string second)
-        {
-            int difArgsCount = 0;
-            if (first.Length != second.Length)
-            {
-                throw new DataException("Terms must be of the same length");
-            }
+        private string? TryGetTerm(string? first, string? second)
+                 {
+                     int difArgsCount = 0;
+                     if (second != null && first != null && first.Length != second.Length)
+                     {
+                         throw new DataException("Terms must be of the same length");
+                     }
+         
+                     string? comparision = null;
 
-            string comparision = null;
+                     if (first != null)
+                         for (int index = 0; index < first.Length; index++)
+                         {
+                             if (second != null && first[index] == second[index])
+                             {
+                                 comparision += first[index];
+                             }
+                             else
+                             {
+                                 difArgsCount++;
+                                 comparision += "*";
+                             }
+                         }
 
-            for (int index = 0; index < first.Length; index++)
-            {
-                if(first[index]==second[index])
-                {
-                    comparision += first[index];
-                }
-                else
-                {
-                    difArgsCount++;
-                    comparision += "*";
-                }
-            }
+                     if (difArgsCount == 1)
+                     {
+                         return comparision;
+                     }
+         
+                     return string.Empty;
+                 }
 
-            if (difArgsCount == 1)
-            {
-                return comparision;
-            }
-
-            return string.Empty;
-        }
-
-        public void SetExpression(string str)
+        public void SetExpression(string? str)
         {
             _sknf = str;
             if (IsCorrect())
             {
-                _expressions = _sknf.Split('&');
-                for (int i = 0; i < _expressions.Length; i++)
-                {
-                    _expressions[i] = _expressions[i].Remove(_expressions[i].Length - 1,1);
-                    _expressions[i] = _expressions[i].Remove(0,1);
-                }
-            };
+                _expressions = _sknf?.Split('&');
+                if (_expressions != null)
+                    for (int i = 0; i < _expressions.Length; i++)
+                    {
+                        _expressions[i] = _expressions[i].Remove(_expressions[i].Length - 1, 1);
+                        _expressions[i] = _expressions[i].Remove(0, 1);
+                    }
+            }
+
             SetVariables();
         }
 
@@ -181,49 +187,70 @@ namespace Laba2_AOIS
         {
             if (IsCorrect())
             {
-                foreach (var expression in _expressions)
-                { 
-                    string[] vars = expression.Split('V');
-                    List<string> variables = vars.ToList();
-                    AllVars.Add(variables);
-                }
+                if (_expressions != null)
+                    AllVars.Clear();
+                    foreach (var expression in _expressions)
+                    {
+                        string[] vars = expression.Split('V');
+                        List<string> variables = vars.ToList();
+                        AllVars.Add(variables);
+                    }
             } 
         }
 
-        public string MinimizeWithCalculation()
+        public string? MinimizeWithCalculation()
         {
-            string result = null;
-            if (IsCorrect())
+            if (_expressions.Length == 1) return _sknf;
+            string startExpression = _sknf;
+            string? totalResult = null;
+            do
             {
-                for (int firstIndex = 0; firstIndex < _expressions.Length - 1; firstIndex++)
-                {
-                    for (int secondIndex = firstIndex + 1; secondIndex < _expressions.Length; secondIndex++)
+                string? result = null;
+                _gluedNumbers.Clear();
+                if (_expressions != null)
+                    for (int firstIndex = 0; firstIndex < _expressions.Length - 1; firstIndex++)
                     {
-                        string subResult = MakeGlue(firstIndex, secondIndex);
-                        result += subResult;
-                        if (subResult != string.Empty)
+                        for (int secondIndex = firstIndex + 1; secondIndex < _expressions.Length; secondIndex++)
                         {
-                            result += "&";
-                            if (!_gluedNumbers.Contains(secondIndex)) _gluedNumbers.Add(secondIndex);
-                            if (!_gluedNumbers.Contains(firstIndex)) _gluedNumbers.Add(firstIndex);
+                            string subResult = MakeGlue(firstIndex, secondIndex);
+                            result += subResult;
+                            if (subResult != string.Empty)
+                            {
+                                result += "&";
+                                if (!_gluedNumbers.Contains(secondIndex)) _gluedNumbers.Add(secondIndex);
+                                if (!_gluedNumbers.Contains(firstIndex)) _gluedNumbers.Add(firstIndex);
+                            }
                         }
                     }
-                }
 
-                if (result.Length > 0) result = result.Remove(result.Length - 1);
-                for (int i = 0; i < _expressions.Length; i++)
+                if (result != null && result.Length > 0)
                 {
-                    if (!_gluedNumbers.Contains(i))
-                    {
-                        result += _expressions[i];
-                    }
+                    result = result.Remove(result.Length - 1);
                 }
-            }
+                else
+                {
+                    SetExpression(startExpression);
+                    return totalResult;
+                }
+                if (_expressions != null)
 
-            LogicalCalculator calculator = new LogicalCalculator(result, 0);
-            string res = calculator.Calculate();
-            return res;
+                    for (int i = 0; i < _expressions.Length; i++)
+                    {
+                        if (!_gluedNumbers.Contains(i))
+                        {
+                            if (result.Length > 1) result += "&";
+                            result += $"({_expressions[i]})";
+                        }
+                    }
+
+                totalResult = result;
+                SetExpression(result);
+            } while (_gluedNumbers.Count > 0);
             
+            LogicalCalculator calculator = new LogicalCalculator(totalResult, 0);
+            string? res = calculator.Calculate();
+            SetExpression(startExpression);
+            return res;
         }
 
         private bool IsCorrect()
@@ -236,33 +263,39 @@ namespace Laba2_AOIS
 
             return true;
         }
-
-        private void ShowStrings()
+        
+        public string? MinimizeWithKarnaugh()
         {
-            foreach (var expression in _expressions)
+            if (_expressions.Length == 1) return _sknf;
+            string? subRezult = MinimizeWithMcCluskeyMethod();
+            string result = null;
+            List<string> rez = subRezult.Split('&').ToList();
+            rez.Reverse();
+            foreach (var VARIABLE in rez)
             {
-                Console.WriteLine(expression);
+                result += VARIABLE+"&";
             }
 
-
-            foreach (var varsSet in AllVars)
+            if (result.Length > 0)
             {
-                foreach (var var in varsSet)
-                {
-                    Console.WriteLine(var);
-                }
+                result = result.Remove(result.Length - 1, 1);
             }
+            return result;
         }
 
         private string MakeGlue(int first, int second)
         {
             if (IsCorrect())
             {
-                int DifferentValues = 0;
+                int differentValues = 0;
                 string result = "(";
                 List<string> commonVars = new List<string>();
                 List<string> firstVarsSet = AllVars[first];
                 List<string> secondVarsSet = AllVars[second];
+                if (firstVarsSet.Count != secondVarsSet.Count)
+                {
+                    return string.Empty;
+                }
                 int countOfVars = AllVars[first].Count;
                 for (int i = 0; i < countOfVars; i++)
                 {
@@ -275,7 +308,11 @@ namespace Laba2_AOIS
                         if (firstVarsSet[i] == Inversed(secondVarsSet[i]) ||
                             Inversed(firstVarsSet[i]) == secondVarsSet[i])
                         {
-                            DifferentValues++;
+                            differentValues++;
+                        }
+                        else
+                        {
+                            return string.Empty;
                         }
                     }
                     
@@ -286,7 +323,7 @@ namespace Laba2_AOIS
                     return string.Empty;
                 }
 
-                if (DifferentValues > 1)
+                if (differentValues > 1)
                 {
                     return String.Empty;
                 }
@@ -296,7 +333,7 @@ namespace Laba2_AOIS
                     result += $"{variable}V";
                 }
 
-                result = result!.Remove(result.Length - 1, 1);
+                result = result.Remove(result.Length - 1, 1);
                 result += ")";
                 return result;
             }

@@ -1,8 +1,8 @@
-﻿namespace Laba2_AOIS
+﻿namespace Laba3_AOIS
 {
     public static class Operations
     {
-        private static readonly Dictionary<string, string> operations = new()
+        private static readonly Dictionary<string, string> _operations = new()
         {
             {"+","+"},
             {"|","+"},
@@ -16,12 +16,12 @@
             {"(", "("}
     };
 
-        public static readonly List<string> keys = new()
+        public static readonly List<string> Keys = new()
         {
             "|", "&", "->", "=>", "=="
         };
 
-        private static readonly Dictionary<char, int> priorities = new()
+        private static readonly Dictionary<char, int> Priorities = new()
         {
             {'!', 5},
             {'*', 4},
@@ -35,7 +35,7 @@
         {
             if (IsOperation(symbol.ToString()))
             {
-                return priorities[symbol];
+                return Priorities[symbol];
             }
 
             throw new ArgumentException($"{symbol} is not operation");
@@ -45,16 +45,15 @@
         {
             if (IsOperation(operation))
             {
-                return operations[operation];
+                return _operations[operation];
             }
 
             throw new Exception("Invalid operation");
-            return null;
         }
 
         public static bool IsOperation(string operation)
         {
-            return operations.ContainsKey(operation);
+            return _operations.ContainsKey(operation);
         }
         
         public static char Conjunction(char first, char second)

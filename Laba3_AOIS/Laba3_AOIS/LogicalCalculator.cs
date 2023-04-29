@@ -1,17 +1,17 @@
-﻿namespace Laba2_AOIS
+﻿namespace Laba3_AOIS
 {
     public class LogicalCalculator
     {
-        private int status;
-        private string _expression;
-        private List<string> _expressions;
-        private readonly List<List<string>> AllVars = new List<List<string>>();
-        private Dictionary<string, string> currentValues = new Dictionary<string, string>();
+        private readonly int _status;
+        private readonly string? _expression;
+        private List<string>? _expressions;
+        private readonly List<List<string>> _allVars = new List<List<string>>();
+        private readonly Dictionary<string, string> _currentValues = new Dictionary<string, string>();
 
-        public LogicalCalculator(string expression, int status)
+        public LogicalCalculator(string? expression, int status)
         {
             _expression = expression;
-            this.status = status;
+            this._status = status;
             SetVariables();
         }
 
@@ -45,51 +45,50 @@
 
         private void SetVariables()
         {
-            if (status == 1)
+            if (_status == 1)
             {
-                SetVariablesForSDNF();
+                SetVariablesForSdnf();
             }
             else
             {
-                SetVariablesForSKNF();
+                SetVariablesForSknf();
             }
         }
 
         private void SetVariablesValues(int expressionIndex)
         {
-            if (currentValues.Count > 0)
+            if (_currentValues.Count > 0)
             {
-                currentValues.Clear();
+                _currentValues.Clear();
             }
 
-            foreach (var variable in AllVars[expressionIndex])
+            foreach (var variable in _allVars[expressionIndex])
             {
-                if (this.status == 1)
+                if (this._status == 1)
                 {
-                    currentValues.Add(variable, "1");
-                    currentValues.Add(Inversed(variable), "0");
+                    _currentValues.Add(variable, "1");
+                    _currentValues.Add(Inversed(variable), "0");
                 }
                 else
                 {
-                    currentValues.Add(variable, "0");
-                    currentValues.Add(Inversed(variable), "1");
+                    _currentValues.Add(variable, "0");
+                    _currentValues.Add(Inversed(variable), "1");
                 }
             }
         }
 
-        public string Calculate()
+        public string? Calculate()
         {
-            string result = null;
-            for(int index =0; index<AllVars.Count; index++)
+            string? result = null;
+            for(int index =0; index<_allVars.Count; index++)
             {
-                string temp = null;
                 SetVariablesValues(index);
                 List<string> newExpression = new List<string>();
-                for (int i = 0; i < AllVars.Count; i++)
+                for (int i = 0; i < _allVars.Count; i++)
                 {
                     if (i == index) continue;
-                    var varList = AllVars[i];
-                    if (status == 1)
+                    var varList = _allVars[i];
+                    if (_status == 1)
                     {
                         string substring = Conjunction(varList[0], varList[1]);
                         newExpression.Add(substring);
@@ -106,7 +105,7 @@
                         var second = newExpression[1];
                         newExpression.RemoveAt(1);
                         newExpression.RemoveAt(0);
-                        if (status == 1)
+                        if (_status == 1)
                         {
                             newExpression.Add(Disjunction(first, second));
                         }
@@ -115,29 +114,25 @@
                             newExpression.Add(Conjunction(first, second));
                         }
                     }
-                result += GetIfReasonable(newExpression[0], index);
+
+                if (newExpression.Count > 0)
+                {
+                    result += GetIfReasonable(newExpression[0], index);
+                }
             }
-            if(result.Length>1)
+            if(result != null && result.Length>1)
                 result = result.Remove(result.Length - 1, 1);
             return result;
         }
 
         private string GetIfReasonable(string value, int index)
         {
-            char separator;
             if (value == "1" || value == "0") return string.Empty;
-            if (status == 0)
-            {
-                separator = '&';
-            }
-            else
-            {
-                separator = 'V';
-            }
-            return $"({_expressions[index]}){separator}";
+            var separator = _status == 0 ? '&' : 'V';
+            return $"({_expressions?[index]}){separator}";
         }
 
-        private void SetVariablesForSKNF()
+        private void SetVariablesForSknf()
         {
             _expressions = _expression.Split('&').ToList();
             for (int index = 0; index < _expressions.Count; index++)
@@ -151,11 +146,11 @@
             foreach (var expr in _expressions)
             {
                 string[] vars = expr.Split('V');
-                AllVars.Add(vars.ToList());
+                _allVars.Add(vars.ToList());
             }
         }
 
-        private void SetVariablesForSDNF()
+        private void SetVariablesForSdnf()
         {
             _expressions = _expression.Split('V').ToList();
             for (int index = 0; index < _expressions.Count; index++)
@@ -169,7 +164,7 @@
             foreach (var expr in _expressions)
             {
                 string[] vars = expr.Split('&');
-                AllVars.Add(vars.ToList());
+                _allVars.Add(vars.ToList());
             }
         }
         
@@ -189,9 +184,9 @@
 
         private string ReplaceWithValue(string temp)
         {
-            if (currentValues.ContainsKey(temp))
+            if (_currentValues.ContainsKey(temp))
             {
-                return currentValues[temp];
+                return _currentValues[temp];
             }
             return temp;
         }
