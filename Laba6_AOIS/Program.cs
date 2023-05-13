@@ -1,6 +1,6 @@
 ﻿using Laba6_AOIS;
 
-HashTable table = new HashTable(30);
+HashTable table = new HashTable(3);
 table.AddNode("power", "the amount of energy transferred per unit time");
 table.AddNode("power", "the amount of energy converted per unit time");
 table.AddNode("Power", "the rate at which electrical energy is transferred");
