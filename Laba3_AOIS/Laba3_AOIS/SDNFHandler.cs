@@ -67,7 +67,7 @@ namespace Laba3_AOIS
         
         public string? MinimizeWithMcCluskeyMethod()
         {
-            if (_expressions.Length == 1) return _sdnf;
+            if (_expressions!.Length == 1) return _sdnf;
             int startTermCount = _terms.Count;
             for (int i = 0; i < startTermCount; i++)
             {
@@ -189,19 +189,19 @@ namespace Laba3_AOIS
             {
                 if (_expressions != null)
                     AllVars.Clear();
-                    foreach (var expression in _expressions)
-                    {
-                        string[] vars = expression.Split('&');
-                        List<string> variables = vars.ToList();
-                        AllVars.Add(variables);
-                    }
+                foreach (var expression in _expressions!)
+                {
+                    string[] vars = expression.Split('&');
+                    List<string> variables = vars.ToList();
+                    AllVars.Add(variables);
+                }
             } 
         }
 
         public string? MinimizeWithCalculation()
         {
-            if (_expressions.Length == 1) return _sdnf;
-            string startExpression = _sdnf;
+            if (_expressions!.Length == 1) return _sdnf;
+            string startExpression = _sdnf!;
             string? totalResult = null;
             do
             {
@@ -266,14 +266,17 @@ namespace Laba3_AOIS
         
         public string? MinimizeWithKarnaugh()
         {
-            if (_expressions.Length == 1) return _sdnf;
+            if (_expressions!.Length == 1) return _sdnf;
             string? subRezult = MinimizeWithMcCluskeyMethod();
-            string result = null;
-            List<string> rez = subRezult.Split('V').ToList();
-            rez.Reverse();
-            foreach (var VARIABLE in rez)
+            string result = null!;
+            if (subRezult != null)
             {
-                result += VARIABLE+"V";
+                List<string> rez = subRezult.Split('V').ToList();
+                rez.Reverse();
+                foreach (var variable in rez)
+                {
+                    result += variable+"V";
+                }
             }
 
             if (result.Length > 0)

@@ -100,20 +100,20 @@
                     }
                 }
                 while (newExpression.Count > 1)
+                {
+                    var first = newExpression[0];
+                    var second = newExpression[1];
+                    newExpression.RemoveAt(1);
+                    newExpression.RemoveAt(0);
+                    if (_status == 1)
                     {
-                        var first = newExpression[0];
-                        var second = newExpression[1];
-                        newExpression.RemoveAt(1);
-                        newExpression.RemoveAt(0);
-                        if (_status == 1)
-                        {
-                            newExpression.Add(Disjunction(first, second));
-                        }
-                        else
-                        {
-                            newExpression.Add(Conjunction(first, second));
-                        }
+                        newExpression.Add(Disjunction(first, second));
                     }
+                    else
+                    {
+                        newExpression.Add(Conjunction(first, second));
+                    }
+                }
 
                 if (newExpression.Count > 0)
                 {
@@ -134,7 +134,7 @@
 
         private void SetVariablesForSknf()
         {
-            _expressions = _expression.Split('&').ToList();
+            _expressions = _expression!.Split('&').ToList();
             for (int index = 0; index < _expressions.Count; index++)
             {
                 string thisExpr = _expressions[index];
@@ -152,7 +152,7 @@
 
         private void SetVariablesForSdnf()
         {
-            _expressions = _expression.Split('V').ToList();
+            _expressions = _expression!.Split('V').ToList();
             for (int index = 0; index < _expressions.Count; index++)
             {
                 string thisExpr = _expressions[index];

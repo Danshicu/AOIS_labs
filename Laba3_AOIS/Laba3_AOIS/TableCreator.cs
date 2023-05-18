@@ -52,13 +52,13 @@
             }
             Console.WriteLine($"Vector is: {functionVector}");
             
-            if (_sknf.Length > 0)
+            if (_sknf!.Length > 0)
             {
                 _sknf = _sknf.Remove(_sknf.Length - 1);
                 _sknfVector = _sknfVector.Remove(_sknfVector.Length - 2, 1);
             }
             
-            if (_sdnf.Length > 0)
+            if (_sdnf!.Length > 0)
             {
                 _sdnf = _sdnf.Remove(_sdnf.Length - 1);
                 _sdnfVector = _sdnfVector.Remove(_sdnfVector.Length - 2,1);

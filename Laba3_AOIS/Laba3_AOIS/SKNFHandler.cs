@@ -67,7 +67,7 @@ namespace Laba3_AOIS
 
         public string? MinimizeWithMcCluskeyMethod()
         {
-            if (_expressions.Length == 1) return _sknf;
+            if (_expressions!.Length == 1) return _sknf;
             int startTermCount = _terms.Count;
             for (int i = 0; i < startTermCount; i++)
             {
@@ -189,19 +189,19 @@ namespace Laba3_AOIS
             {
                 if (_expressions != null)
                     AllVars.Clear();
-                    foreach (var expression in _expressions)
-                    {
-                        string[] vars = expression.Split('V');
-                        List<string> variables = vars.ToList();
-                        AllVars.Add(variables);
-                    }
+                foreach (var expression in _expressions!)
+                {
+                    string[] vars = expression.Split('V');
+                    List<string> variables = vars.ToList();
+                    AllVars.Add(variables);
+                }
             } 
         }
 
         public string? MinimizeWithCalculation()
         {
-            if (_expressions.Length == 1) return _sknf;
-            string startExpression = _sknf;
+            if (_expressions!.Length == 1) return _sknf;
+            string startExpression = _sknf!;
             string? totalResult = null;
             do
             {
@@ -266,14 +266,17 @@ namespace Laba3_AOIS
         
         public string? MinimizeWithKarnaugh()
         {
-            if (_expressions.Length == 1) return _sknf;
+            if (_expressions!.Length == 1) return _sknf;
             string? subRezult = MinimizeWithMcCluskeyMethod();
-            string result = null;
-            List<string> rez = subRezult.Split('&').ToList();
-            rez.Reverse();
-            foreach (var VARIABLE in rez)
+            string result = null!;
+            if (subRezult != null)
             {
-                result += VARIABLE+"&";
+                List<string> rez = subRezult.Split('&').ToList();
+                rez.Reverse();
+                foreach (var variable in rez)
+                {
+                    result += variable+"&";
+                }
             }
 
             if (result.Length > 0)

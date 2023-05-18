@@ -115,9 +115,9 @@
             return value ? "1" : "0";
         }
 
-        public string? ReturnSknf()
+        public string ReturnSknf()
         {
-            string? function = "(";
+            string function = "(";
             foreach (var value in _variables)
             {
                 if (_variablesValues[value])
@@ -135,9 +135,9 @@
             return function;
         }
 
-        public string? ReturnSdnf()
+        public string ReturnSdnf()
         {
-            string? function = "(";
+            string function = "(";
             foreach (var value in _variables)
             {
                 if (_variablesValues[value])
