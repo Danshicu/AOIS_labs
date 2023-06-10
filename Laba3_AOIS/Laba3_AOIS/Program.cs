@@ -5,7 +5,7 @@
     {
         static void Main()
         {
-            string expression = "(A+((!B*C)*!C)+B)";
+            string expression = "(!(a+b)+c)";
             TableCreator table = new TableCreator(expression);
             table.MakeTable();
         }
